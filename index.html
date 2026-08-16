@@ -1482,31 +1482,63 @@ function budgetRow(
 ========================================================= */
 
 function changeMonth(amount){
+function changeMonth(amount){
 
-  const date =
-    new Date(
-      selectedMonth +
-      "-01T00:00:00"
-    );
+  // Parse the selected month safely as local time.
+  const parts = selectedMonth.split("-");
+  let year = Number(parts[0]);
+  let month = Number(parts[1]);
 
-  date.setMonth(
-    date.getMonth() + amount
-  );
+  if(!year || !month){
+    const now = new Date();
+    year = now.getFullYear();
+    month = now.getMonth() + 1;
+  }
 
+  // Move month forward/backward.
+  month += Number(amount);
+
+  // Handle year changes.
+  while(month > 12){
+    month -= 12;
+    year++;
+  }
+
+  while(month < 1){
+    month += 12;
+    year--;
+  }
+
+  // Always keep YYYY-MM format.
   selectedMonth =
-    date.toISOString()
-      .slice(0,7);
+    String(year) +
+    "-" +
+    String(month).padStart(2,"0");
 
+  // Move calendar selection to the first day
+  // of the newly selected month.
   selectedCalendarDate =
     selectedMonth + "-01";
 
-  if(currentPage==="home"){
+  // Re-render the currently visible page.
+  if(currentPage === "home"){
     renderHome();
-  }else{
+  }
+  else if(currentPage === "money"){
     renderMoney();
   }
+  else{
+    renderApp();
+  }
 
-}
+  // Keep the selected month after reload/navigation.
+  try{
+    sessionStorage.setItem(
+      "finman_selected_month",
+      selectedMonth
+    );
+  }catch(error){}
+    }
 
 
 /* =========================================================
