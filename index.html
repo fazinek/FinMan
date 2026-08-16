@@ -1481,64 +1481,32 @@ function budgetRow(
    MONTH NAVIGATION
 ========================================================= */
 
-function changeMonth(amount){
-function changeMonth(amount){
+function changeMonth(amount) {
+  const [year, month] = selectedMonth.split("-").map(Number);
 
-  // Parse the selected month safely as local time.
-  const parts = selectedMonth.split("-");
-  let year = Number(parts[0]);
-  let month = Number(parts[1]);
+  // month - 1 because JavaScript Date uses 0–11
+  const date = new Date(year, month - 1, 1);
 
-  if(!year || !month){
-    const now = new Date();
-    year = now.getFullYear();
-    month = now.getMonth() + 1;
-  }
+  date.setMonth(date.getMonth() + Number(amount));
 
-  // Move month forward/backward.
-  month += Number(amount);
+  const newYear = date.getFullYear();
+  const newMonth = String(date.getMonth() + 1).padStart(2, "0");
 
-  // Handle year changes.
-  while(month > 12){
-    month -= 12;
-    year++;
-  }
+  selectedMonth = `${newYear}-${newMonth}`;
+  selectedCalendarDate = `${selectedMonth}-01`;
 
-  while(month < 1){
-    month += 12;
-    year--;
-  }
-
-  // Always keep YYYY-MM format.
-  selectedMonth =
-    String(year) +
-    "-" +
-    String(month).padStart(2,"0");
-
-  // Move calendar selection to the first day
-  // of the newly selected month.
-  selectedCalendarDate =
-    selectedMonth + "-01";
-
-  // Re-render the currently visible page.
-  if(currentPage === "home"){
+  if (currentPage === "home") {
     renderHome();
-  }
-  else if(currentPage === "money"){
+  } else if (currentPage === "money") {
     renderMoney();
-  }
-  else{
+  } else {
     renderApp();
   }
 
-  // Keep the selected month after reload/navigation.
-  try{
-    sessionStorage.setItem(
-      "finman_selected_month",
-      selectedMonth
-    );
-  }catch(error){}
-    }
+  try {
+    sessionStorage.setItem("finman_selected_month", selectedMonth);
+  } catch (error) {}
+  }
 
 
 /* =========================================================
