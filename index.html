@@ -1481,32 +1481,46 @@ function budgetRow(
    MONTH NAVIGATION
 ========================================================= */
 
-function changeMonth(amount) {
-  const [year, month] = selectedMonth.split("-").map(Number);
+function changeMonth(amount){
 
-  // month - 1 because JavaScript Date uses 0–11
-  const date = new Date(year, month - 1, 1);
+  const [year, month] =
+    selectedMonth.split("-").map(Number);
 
-  date.setMonth(date.getMonth() + Number(amount));
+  // JavaScript months are 0–11
+  const date =
+    new Date(
+      year,
+      month - 1,
+      1
+    );
 
-  const newYear = date.getFullYear();
-  const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+  date.setMonth(
+    date.getMonth() + Number(amount)
+  );
 
-  selectedMonth = `${newYear}-${newMonth}`;
-  selectedCalendarDate = `${selectedMonth}-01`;
+  // IMPORTANT:
+  // Use local date values instead of toISOString().
+  // This prevents India timezone from skipping a month.
+  selectedMonth =
+    date.getFullYear() +
+    "-" +
+    String(
+      date.getMonth() + 1
+    ).padStart(2,"0");
 
-  if (currentPage === "home") {
+  selectedCalendarDate =
+    selectedMonth + "-01";
+
+  if(currentPage === "home"){
     renderHome();
-  } else if (currentPage === "money") {
+  }
+  else if(currentPage === "money"){
     renderMoney();
-  } else {
+  }
+  else{
     renderApp();
   }
-
-  try {
-    sessionStorage.setItem("finman_selected_month", selectedMonth);
-  } catch (error) {}
-  }
+}
 
 
 /* =========================================================
